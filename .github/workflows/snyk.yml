@@ -1,0 +1,68 @@
+name: Snyk Security Scan
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependencies:
+    name: Dependency scan (${{ matrix.project }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [mobile, server]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.project }}
+        run: npm install --legacy-peer-deps
+
+      - uses: snyk/actions/setup@master
+
+      - name: Run Snyk dependency test
+        working-directory: ${{ matrix.project }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        # Remove continue-on-error once the project is clean, so new
+        # vulnerabilities actually fail the build.
+        continue-on-error: true
+        run: snyk test --severity-threshold=high --sarif-file-output=snyk-deps.sarif
+
+      - name: Upload dependency scan results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ matrix.project }}/snyk-deps.sarif
+          category: snyk-deps-${{ matrix.project }}
+
+  code:
+    name: Code scan (SAST)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: snyk/actions/setup@master
+
+      - name: Run Snyk Code test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
+        run: snyk code test --sarif-file-output=snyk-code.sarif
+
+      - name: Upload code scan results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-code.sarif
+          category: snyk-code

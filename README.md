@@ -36,3 +36,9 @@ The app talks to the AI server at the URL in `mobile/app.json` → `expo.extra.a
 
 - Habit data is local-only for now — no accounts, no cloud sync of habit data. Git here only tracks source code.
 - AI features (Coach chat, Insights) require the server to be running and reachable from the device.
+
+## Security scanning (Snyk)
+
+`.github/workflows/snyk.yml` runs on every push/PR to `master`: a dependency vulnerability scan for both `mobile/` and `server/`, plus a Snyk Code (SAST) scan. Results upload to the repo's **Security → Code scanning** tab.
+
+To activate it: add a `SNYK_TOKEN` repo secret (Settings → Secrets and variables → Actions) with an API token from your Snyk account (account.snyk.io → Account settings). Until that secret is set, the workflow's Snyk steps will fail — they're set to `continue-on-error: true` so that doesn't block the rest of CI. Once the project's known issues are triaged, remove `continue-on-error` so new vulnerabilities actually fail the build.
