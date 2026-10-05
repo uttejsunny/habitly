@@ -6,4 +6,7 @@ if (!process.env.GROQ_API_KEY) {
 
 export const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export const COACH_MODEL = "llama-3.3-70b-versatile";
+// Swapped to an openai/gpt-oss model: this Groq account has no Llama
+// chat/instruct models enabled yet (only llama-prompt-guard-2-*, a safety
+// filter). Switch back to a llama-3.x model once account access shows up.
+export const COACH_MODEL = "openai/gpt-oss-20b";
