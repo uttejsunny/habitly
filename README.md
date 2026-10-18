@@ -1,4 +1,4 @@
-# HabitAI (working name)
+# Habitly
 
 A HabitBull-style habit tracker with an AI coach, built with React Native (Expo) and a thin Llama (Groq) proxy server. Designed to grow beyond habits over time.
 
@@ -30,7 +30,7 @@ npx expo start
 
 Press `a` to launch on a connected Android device/emulator (or scan the QR code with Expo Go).
 
-The app talks to the AI server at the URL in `mobile/app.json` → `expo.extra.apiBaseUrl` (defaults to `http://10.0.2.2:3000`, the Android emulator's alias for your machine's `localhost`). If you're using a physical device, change this to your computer's LAN IP, e.g. `http://192.168.1.23:3000`.
+The app talks to the AI server at the URL in `mobile/app.json` → `expo.extra.apiBaseUrl`. This needs to be your computer's LAN IP (e.g. `http://192.168.1.23:3000`) when testing on a physical device via Expo Go, since the phone is a separate device on the network — `http://10.0.2.2:3000` only works from the Android emulator, never from a real phone.
 
 ## Notes
 

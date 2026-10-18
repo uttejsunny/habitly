@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "Habitly",
+    "slug": "habitly",
     "version": "1.0.0",
-    "scheme": "habitai",
+    "scheme": "habitly",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,7 +32,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiBaseUrl": "http://10.0.2.2:3000"
+      "apiBaseUrl": "http://192.168.29.202:3000"
     }
   }
 }
