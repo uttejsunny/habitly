@@ -10,13 +10,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { sendCoachMessage, type ChatMessage } from "../../features/ai/client";
-import { useHabits } from "../../features/habits/useHabits";
+import { sendCoachMessage, type ChatMessage } from "../../core/ai/client";
 
 export default function CoachScreen() {
-  const { habits } = useHabits();
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: "Hi! I'm your habit coach. Ask me anything about staying on track." },
+    { role: "assistant", content: "Hi! I'm your personal coach. Ask me anything about your habits, reminders, or wardrobe." },
   ]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -32,7 +30,7 @@ export default function CoachScreen() {
     setSending(true);
     setError(null);
     try {
-      const reply = await sendCoachMessage(next, habits);
+      const reply = await sendCoachMessage(next);
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (e) {
       setError("Couldn't reach the AI server. Make sure it's running and reachable from this device.");

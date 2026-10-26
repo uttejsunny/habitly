@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
-import type { HabitWithStats } from "../habits/types";
+import { modules } from "../modules/registry";
+import type { ContextSection } from "../modules/types";
 
 const API_BASE_URL = (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ?? "http://10.0.2.2:3000";
 
@@ -8,32 +9,29 @@ export interface ChatMessage {
   content: string;
 }
 
-function toHabitSummary(habits: HabitWithStats[]) {
-  return habits.map((h) => ({
-    name: h.name,
-    frequency: h.activeDays.length === 7 ? "daily" : `on ${h.activeDays.length} days/week`,
-    currentStreak: h.currentStreak,
-    longestStreak: h.longestStreak,
-    completionRate: h.completionRate,
-  }));
+async function gatherContext(): Promise<ContextSection[]> {
+  const sections = await Promise.all(modules.map((m) => m.getAIContext()));
+  return sections.filter((s): s is ContextSection => s !== null);
 }
 
-export async function sendCoachMessage(messages: ChatMessage[], habits: HabitWithStats[]): Promise<string> {
+export async function sendCoachMessage(messages: ChatMessage[]): Promise<string> {
+  const context = await gatherContext();
   const res = await fetch(`${API_BASE_URL}/ai/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages, habits: toHabitSummary(habits) }),
+    body: JSON.stringify({ messages, context }),
   });
   if (!res.ok) throw new Error(`Coach request failed: ${res.status}`);
   const data = await res.json();
   return data.reply as string;
 }
 
-export async function fetchInsights(habits: HabitWithStats[]): Promise<string[]> {
+export async function fetchInsights(): Promise<string[]> {
+  const context = await gatherContext();
   const res = await fetch(`${API_BASE_URL}/ai/insights`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ habits: toHabitSummary(habits) }),
+    body: JSON.stringify({ context }),
   });
   if (!res.ok) throw new Error(`Insights request failed: ${res.status}`);
   const data = await res.json();

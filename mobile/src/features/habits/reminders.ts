@@ -1,15 +1,16 @@
-import Constants from "expo-constants";
 import type * as NotificationsType from "expo-notifications";
 
-// expo-notifications' Android functionality was removed from Expo Go in SDK 53 -
-// it only works in a standalone app or a custom dev client build. Even just
-// `import`-ing it throws there, since the native binding is accessed at module
-// load time - so it must be loaded with a runtime require() inside this guard,
-// never a static top-level import, or Metro hoists the import above the check.
-const isExpoGo = Constants.appOwnership === "expo";
-
+// expo-notifications' Android functionality is unavailable in Expo Go (removed
+// since SDK 53) - requiring it there throws immediately, since the native
+// binding is accessed at module load time. Environment-detection flags proved
+// unreliable across SDK bumps (Constants.appOwnership is deprecated and
+// stopped reporting "expo" for Expo Go as of SDK 58's expo-constants; the
+// recommended replacement, Constants.executionEnvironment, didn't catch it
+// either). So instead of guessing the environment, just try the require and
+// treat any failure as "notifications aren't available here" - this stays
+// correct regardless of how future SDKs report the environment.
 let Notifications: typeof NotificationsType | null = null;
-if (!isExpoGo) {
+try {
   Notifications = require("expo-notifications");
   Notifications!.setNotificationHandler({
     handleNotification: async () => ({
@@ -19,6 +20,8 @@ if (!isExpoGo) {
       shouldShowList: true,
     }),
   });
+} catch {
+  Notifications = null;
 }
 
 export async function ensureNotificationPermission(): Promise<boolean> {

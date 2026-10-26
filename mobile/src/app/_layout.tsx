@@ -25,6 +25,8 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="habit/[id]" options={{ title: "Habit" }} />
         <Stack.Screen name="habit/new" options={{ title: "New Habit", presentation: "modal" }} />
+        <Stack.Screen name="modules/reminders" options={{ title: "Reminders" }} />
+        <Stack.Screen name="modules/wardrobe" options={{ title: "Wardrobe" }} />
       </Stack>
     </SafeAreaProvider>
   );
